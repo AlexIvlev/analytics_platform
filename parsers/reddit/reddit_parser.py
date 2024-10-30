@@ -84,7 +84,7 @@ class RedditParser:
             except prawcore.exceptions.TooManyRequests:
                 logging.error(f"Rate limit exceeded while processing '{subreddit}'")
 
-        self.df = pd.concat([self.df, pd.DataFrame(entries, columns=self.df.columns)])
+            self.df = pd.concat([self.df, pd.DataFrame(entries, columns=self.df.columns)])
 
     def save_to_parquet(self, filename: str = 'reddit_parser') -> None:
         date_time = time.strftime('%Y-%m-%d_%H-%M-%S')
