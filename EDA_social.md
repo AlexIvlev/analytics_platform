@@ -20,6 +20,7 @@
 | 12 | processed_text_length | Length of the processed text |
 | 13 | sentiment_scores      | Sentiment score of the text content |
 | 14 | entities              | Extracted entities from the text content |
+| 15 | doc_embedding         | Embeddings created from the text content |
 
 Исходные данные представляют собой тексты постов и комментариев пользователей. Предобработка помогла очистить данные от английских стоп-слов, пустых и бессмысленных с точки зрения нашей задачи текстов.
 Данные были обогащены оценкой сентимента текста, выделенными организациями, о которых говорится в тексте.
