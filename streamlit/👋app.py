@@ -1,11 +1,13 @@
 import streamlit as st
-import requests
-import pandas as pd
+import logging
+from util.logging_handler import configure_logger
+
 
 st.set_page_config(
     page_title="Hello",
     page_icon="👋",
 )
+logger = configure_logger(__name__, logging.DEBUG)
 
 st.write("# Выберите один из предложенных вариантов! 👋")
 st.sidebar.success("Select a demo above.")
@@ -27,3 +29,5 @@ st.markdown(
     - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
 """
 )
+
+logger.debug("Main page loaded")
