@@ -4,7 +4,7 @@
 [Вики проекта](https://www.notion.so/10f05b0da1f0805bbe14d761cbe60897?v=fec6b815867c48448d1d6792d1aec351)
 
 ## Участники проекта:
-**Куратор**: Елизавета Гаврилова ([@lizvladii](https://t.me/lizvladii))  
+**Куратор**: Александра Ковалева ([@ak0va](https://t.me/ak0va))  
 **Метакуратор**: Евгений Паточенко ([@evg_pat](https://t.me/evg_pat))  
 
 Ивлев Алексей Иванович ([@AlexIvlev87](https://t.me/AlexIvlev87))  
