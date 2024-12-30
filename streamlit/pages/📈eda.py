@@ -1,12 +1,16 @@
 import logging
 
 import pandas as pd
-import plotly.express as px
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from util.check_dataset import check_uploaded_data
 from util.logging_handler import configure_logger
+from util.plotly_helpers import (plot_relative_price_change,
+                                 plot_subreddits_distribution,
+                                 plot_temporal_analysis,
+                                 plot_ticker_treemap,
+                                 plot_news_distributions)
 from util.wordcloud import create_wordcloud, create_bigram_cloud
 
 st.set_page_config(page_title="EDA", page_icon="📈")
@@ -21,16 +25,11 @@ st.write(
     Social и News датасеты имеют разные опции визуализации."""
 )
 
-dataset = st.radio("Выберите датасет", ("News :newspaper:", "Social🧻"))
+dataset = st.radio("Выберите датасет", ("News 📰", "Social 🧻"))
 
 st.write(f"Вы выбрали датасет: {dataset}")
 
 uploaded_file = st.file_uploader("Выберите parquet-файл с датасетом", type=["parquet"])
-
-show_ticker_treemap = st.checkbox("Показать тикеры в виде treemap")
-show_wordcloud = st.checkbox("Показать облако слов")
-show_subreddit_distribution = st.checkbox("Показать распределение по сабреддитам")
-show_relative_price_change = st.checkbox("Показать относительное изменение цен за день")
 
 
 @st.cache_data
@@ -38,9 +37,10 @@ def load_data(file: UploadedFile) -> pd.DataFrame:
     return pd.read_parquet(file)
 
 
-def plot_wordcloud(df: pd.DataFrame) -> None:
-    wordcloud = create_wordcloud(df)
-    bigram_cloud = create_bigram_cloud(df)
+@st.cache_data
+def plot_wordcloud(data: pd.DataFrame) -> None:
+    wordcloud = create_wordcloud(data)
+    bigram_cloud = create_bigram_cloud(data)
     st.plotly_chart(wordcloud, key='wordcloud')
     st.plotly_chart(bigram_cloud, key='bigram_wordcloud')
 
@@ -54,60 +54,36 @@ if uploaded_file:
         st.error(error_message)
     st.dataframe(df)
 
-    if show_wordcloud:
-        plot_wordcloud(df)
+    if dataset == "Social 🧻" and correct:
+        show_subreddit_distribution = st.checkbox("Показать распределение по сабреддитам")
+        show_ticker_treemap = st.checkbox("Показать тикеры в виде treemap")
+        show_relative_price_change = st.checkbox("Показать относительное изменение цен за день")
+        show_wordcloud = st.checkbox("Показать облако слов")
 
-    if show_subreddit_distribution:
-        subreddit_counts = df['subreddit'].value_counts().reset_index()
-        subreddit_counts.columns = ['subreddit', 'count']
+        if show_subreddit_distribution:
+            st.plotly_chart(plot_subreddits_distribution(df))
 
-        custom_colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A']
+        if show_ticker_treemap:
+            st.plotly_chart(plot_ticker_treemap(df))
 
-        fig = px.bar(subreddit_counts,
-                     x='subreddit',
-                     y='count',
-                     title='Distribution of Posts by Subreddit',
-                     color='subreddit',
-                     color_discrete_sequence=custom_colors)
-        fig.update_layout(xaxis_title='Subreddit', yaxis_title='Number of Posts')
-        st.plotly_chart(fig)
+        if show_relative_price_change:
+            st.plotly_chart(plot_relative_price_change(df))
 
-    if show_relative_price_change:
-        custom_colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A']
+        if show_wordcloud:
+            plot_wordcloud(df)
+    elif dataset == "News 📰" and correct:
+        show_distributions = st.checkbox("Показать распределения")
+        show_temporal_analysis = st.checkbox("Показать временную динамику статей по типам и секторам")
 
-        df['rel_price_change'] = ((df['price_1d'] - df['created_price']) / df['created_price']) * 100
-        df = df[df['rel_price_change'] > -100]
-        df = df[df['rel_price_change'] < 100]
+        if show_distributions:
+            figures = plot_news_distributions(df)
+            for fig in figures:
+                st.plotly_chart(fig)
 
-        fig = px.histogram(
-            df,
-            x='rel_price_change',
-            nbins=200,
-            title='Distribution of Price Change %',
-            color_discrete_sequence=custom_colors
-        )
+        if show_temporal_analysis:
+            figures = plot_temporal_analysis(df)
+            for fig in figures:
+                st.plotly_chart(fig)
 
-        fig.update_layout(
-            xaxis_title='Relative Price Change',
-            yaxis_title='Frequency',
-            bargap=0.1,
-            width=1000,
-            height=500,
-        )
-
-        st.plotly_chart(fig)
-
-    if show_ticker_treemap:
-        ticker_counts = df['ticker'].value_counts().reset_index()
-        ticker_counts.columns = ['ticker', 'count']
-
-        fig = px.treemap(
-            ticker_counts,
-            path=['ticker'],
-            values='count',
-            title='Treemap of Ticker Counts'
-        )
-
-        st.plotly_chart(fig)
 
 logger.debug("EDA page loaded")

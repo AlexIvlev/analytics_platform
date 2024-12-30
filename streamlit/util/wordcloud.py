@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from pandas import DataFrame
 from wordcloud import WordCloud
 
-from .plotly_image import create_image
+from .plotly_helpers import create_image
 from nltk import ngrams
 
 

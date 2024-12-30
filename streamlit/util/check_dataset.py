@@ -12,10 +12,13 @@ def check_uploaded_data(df: DataFrame, dataset: str) -> (bool, str):
         return False, "Загружен пустой датасет"
     if df.shape[0] < 100:
         return False, "Датасет содержит менее 100 наблюдений, загрузите датасет с большим количеством данных"
-    if dataset == "social🧻":
+    if dataset == "Social 🧻":
         if df.shape[1] != len(SOCIAL_EXPECTED_COLUMNS):
-            return False, f"Неверное количество столбцов. Ожидалось {len(SOCIAL_EXPECTED_COLUMNS)}, получено {df.shape[1]}"
+            return False, f"Неверное количество столбцов." \
+                          f" Ожидалось {len(SOCIAL_EXPECTED_COLUMNS)}, получено {df.shape[1]}"
         for col in SOCIAL_EXPECTED_COLUMNS:
             if col not in df.columns:
                 return False, f"Отсутствует столбец {col}"
+        return True, None
+    else:
         return True, None
