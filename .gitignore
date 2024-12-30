@@ -164,6 +164,3 @@ cython_debug/
 
 # Mac
 .DS_Store
-
-# Models
-backend/models/
