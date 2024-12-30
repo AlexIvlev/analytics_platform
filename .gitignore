@@ -122,7 +122,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+backend/.env
 .venv
 env/
 venv/
@@ -164,3 +164,6 @@ cython_debug/
 
 # Mac
 .DS_Store
+
+# Models
+backend/models/
