@@ -21,6 +21,7 @@ def fetch_models():
     data = response.json()
     return data
 
+
 data = [
     {
         "models": [
@@ -47,42 +48,72 @@ models_df = pd.DataFrame([
     {
         "ID": model["id"],
         "Type": model["type"],
+        "Description": model["description"],
         "Hyperparameters": str(model["hyperparameters"]),
-        "Has Loss Curve": bool(model["learning_curve"])
+        "Has Learning Curve": bool(model["learning_curve"])
     }
     for model in models
 ])
 
+model_ids = [model["id"] for model in models]
+
 st.subheader("Список моделей")
 st.dataframe(models_df)
 
-model_ids = [model["id"] for model in models]
-selected_model_id = st.selectbox("Выберите модель для просмотра информации:", model_ids)
+show_model_details = st.checkbox("Отобразить подробную информацию о модели", value=False)
+show_learning_curve_comparison = st.checkbox("Отобразить сравнение кривых обучения", value=False)
 
-selected_model = next(model for model in models if model["id"] == selected_model_id)
-st.write("### Информация о выбранной модели")
-st.json(selected_model)
+if show_model_details:
 
-if selected_model["learning_curve"]:
-    st.write("### Кривая обучения")
+    selected_model_id = st.selectbox("Выберите модель для просмотра информации:", model_ids)
 
-    fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            y=selected_model["learning_curve"],
-            mode='lines+markers',
-            name=f"Кривая обучения ({selected_model_id})"
+    selected_model = next(model for model in models if model["id"] == selected_model_id)
+    st.write("### Информация о выбранной модели")
+    st.json(selected_model)
+
+    if selected_model["learning_curve"]:
+        st.write("### Кривая обучения")
+
+        fig = go.Figure()
+        fig.add_trace(
+            go.Scatter(
+                y=selected_model["learning_curve"],
+                mode='lines+markers',
+                name=f"Кривая обучения ({selected_model_id})"
+            )
         )
-    )
+        fig.update_layout(
+            title=f"Кривая обучения для модели {selected_model_id}",
+            xaxis_title="Эпоха",
+            yaxis_title="Функция потерь",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig)
+
+    else:
+        st.write("Для данной модели нет данных о кривой обучения")
+
+    logger.debug("Models page loaded")
+
+if show_learning_curve_comparison:
+    selected_ids = st.multiselect("Выберите модели для сравнения:", model_ids)
+
+    st.write("### Сравнение кривых обучения")
+    fig = go.Figure()
+    for selected_id in selected_ids:
+        model = next(model for model in models if model["id"] == selected_id)
+        if model["learning_curve"]:
+            fig.add_trace(
+                go.Scatter(
+                    y=model["learning_curve"],
+                    mode='lines+markers',
+                    name=f"Кривая обучения ({model['id']})"
+                )
+            )
     fig.update_layout(
-        title=f"Кривая обучения для модели {selected_model_id}",
+        title="Сравнение кривых обучения",
         xaxis_title="Эпоха",
         yaxis_title="Функция потерь",
         template="plotly_white"
     )
     st.plotly_chart(fig)
-
-else:
-    st.write("Для данной модели нет данных о кривой обучения")
-
-logger.debug("Models page loaded")
