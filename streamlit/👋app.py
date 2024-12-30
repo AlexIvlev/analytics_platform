@@ -7,7 +7,7 @@ st.set_page_config(
     page_title="Hello",
     page_icon="👋",
 )
-logger = configure_logger(__name__, logging.DEBUG)
+logger = configure_logger(__name__, logging.INFO)
 
 st.write("# Выберите один из предложенных вариантов! 👋")
 st.sidebar.success("Select a demo above.")
@@ -29,5 +29,7 @@ st.markdown(
     - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
 """
 )
+
+st.session_state["backend_url"] = "http://localhost:8000"
 
 logger.debug("Main page loaded")

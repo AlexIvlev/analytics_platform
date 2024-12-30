@@ -28,4 +28,4 @@ def create_bigram_cloud(df: DataFrame) -> go.Figure:
     bigram_dict = {" ".join(bigram): count for bigram, count in bigram_counts.items()}
     bigram_wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(bigram_dict)
 
-    return create_image(bigram_wordcloud, type='Bigram')
+    return create_image(bigram_wordcloud, cloud_type='Bigram')

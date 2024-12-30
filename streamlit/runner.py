@@ -12,7 +12,6 @@ st.write("# Выберите один из предложенных вариан
 for logger_name in logging.root.manager.loggerDict:
     if logger_name.startswith("streamlit"):
         streamlit_logger = logging.getLogger(logger_name)
-        streamlit_logger.setLevel(logging.DEBUG)
         streamlit_logger.addHandler(create_file_handler(LOGS_DIR))
 
 
