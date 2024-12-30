@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 
+
 def get_daily_data(ticker_symbol, period='1y'):
     ticker = yf.Ticker(ticker_symbol)
 
@@ -21,12 +22,14 @@ def get_daily_data(ticker_symbol, period='1y'):
     
     return daily_data
 
+
 def save_to_csv(data, ticker, filename=None):
     if filename is None:
         filename = f"{ticker}_daily_data_{datetime.now().strftime('%Y%m%d')}.csv"
-    
+        
     data.to_csv(filename, index=False, encoding='utf-8-sig')
     print(f"Данные сохранены в файл: {filename}")
+
 
 def get_multiple_tickers_daily(tickers_list, period='1y'):
     results = {}
@@ -43,4 +46,3 @@ def get_multiple_tickers_daily(tickers_list, period='1y'):
 aapl_data = get_daily_data('AMZN')
 
 save_to_csv(aapl_data, 'AMZN')
-
