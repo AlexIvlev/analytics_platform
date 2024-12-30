@@ -254,5 +254,3 @@ def plot_temporal_analysis(df: pd.DataFrame) -> (go.Figure, go.Figure, go.Figure
     fig_month_sector.update_layout(xaxis_tickangle=45)
 
     return fig_day_article, fig_month_article, fig_day_sector, fig_month_sector
-
-
