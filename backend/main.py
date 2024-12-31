@@ -12,19 +12,14 @@ from multiprocessing import Value, Lock
 
 from utils import save_model_meta
 
-ml_models = {}
 settings = Settings()
 
 
+@asynccontextmanager
 async def ml_lifespan_manager(app: FastAPI):
-    model_path_social = Path(settings.model_storage_dir) / settings.default_model_social
-    model_path_news = Path(settings.model_storage_dir) / settings.default_model_news
-
-    # Путь к файлу состояния (если его нет, он будет создан)
     inference_state_path = Path(settings.model_storage_dir) / "inference_state.json"
 
     try:
-        # Если файл состояния не существует или в нем нет нужных ключей, создаем его
         if not inference_state_path.exists():
             state = {
                 "social": settings.default_model_social,
@@ -52,10 +47,10 @@ async def ml_lifespan_manager(app: FastAPI):
         )
 
         yield
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Error in ml_lifespan_manager: {e}")
     finally:
-        ml_models.clear()
+        pass
 
 app = FastAPI(
     title="backend",

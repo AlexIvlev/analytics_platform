@@ -27,7 +27,8 @@ class ModelStorageManager:
                     id=model_id,
                     type=model_info["type"],
                     description=model_info["description"],
-                    hyperparameters=model_info["hyperparameters"]
+                    hyperparameters=model_info["hyperparameters"],
+                    learning_curve=model_info["learning_curve"]
                 )
                 models_list.append(model_list_item)
 

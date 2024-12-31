@@ -14,6 +14,7 @@ class ModelListItem(BaseModel):
     description: str
     type: ModelType
     hyperparameters: dict[str, Any]
+    learning_curve: list[float]
 
 
 class ModelListResponse(BaseModel):

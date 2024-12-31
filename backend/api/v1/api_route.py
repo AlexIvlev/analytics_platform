@@ -1,6 +1,7 @@
-from multiprocessing import Process, Value, Lock
+from multiprocessing import Process
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Request, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Request, Path, Body
 from http import HTTPStatus
 
 from serializers import FitRequest, FitResponse, ModelResponse, PredictResponse, PredictRequest, \
@@ -19,16 +20,11 @@ model_manager = ModelInferenceManager(
 )
 
 
-def wait_for_process(process: Process, active_train_processes: Value, lock: Lock):
-    """Функция для ожидания завершения процесса и обновления счётчика процессов."""
-    process.join()
-    with lock:
-        active_train_processes.value -= 1
-    print(f"Training process finished")
-
-
 @router.post("/fit", status_code=HTTPStatus.CREATED, response_model=FitResponse)
-async def fit(request: FitRequest, req: Request, background_tasks: BackgroundTasks):
+async def fit(
+    request: Annotated[FitRequest, Body(description="Запрос на запуск обучения модели")],
+    req: Request
+):
     """Запуск обучения модели в отдельном процессе."""
     active_train_processes = req.app.state.active_train_processes
     lock = req.app.state.lock
@@ -42,16 +38,26 @@ async def fit(request: FitRequest, req: Request, background_tasks: BackgroundTas
             )
         active_train_processes.value += 1
 
-    process = Process(target=fit_model, args=(request,))
-    process.start()
+    try:
+        process = Process(target=fit_model, args=(request,), kwargs={"timeout": 10})
+        process.start()
+        process.join()
 
-    background_tasks.add_task(wait_for_process, process, active_train_processes, lock)
+        if process.exitcode != 0:
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                detail=f"Model {request.config.id} training failed"
+            )
 
-    return FitResponse(message=f"Model {request.config.id} training started")
+        return FitResponse(message=f"Model {request.config.id} training completed successfully")
+
+    finally:
+        with lock:
+            active_train_processes.value -= 1
 
 
 @router.post("/set", response_model=SetResponse)
-async def set(request: SetRequest):
+async def set(request: Annotated[SetRequest, Body(description="Запрос на установку активной модели")]):
     """Установка активных моделей."""
     try:
         message = model_manager.load(request.model_type, request.model_id)
@@ -62,15 +68,15 @@ async def set(request: SetRequest):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
 
-@router.get("/get_status", response_model=StatusResponse)
-async def get_status():
+@router.get("/status", response_model=StatusResponse)
+async def status():
     """Получение информации о загруженных моделях."""
     status = model_manager.get_status()
     return StatusResponse(status=status['status'], models=status.get('models'))
 
 
 @router.post("/predict", response_model=PredictResponse)
-async def predict(request: PredictRequest):
+async def predict(request: Annotated[PredictRequest, Body(description="Запрос на предсказание модели")]):
     """Предсказание от загруженной модели."""
     try:
         predictions = model_manager.predict(request.id, request.X)
@@ -90,7 +96,7 @@ async def models():
 
 
 @router.delete("/remove/{model_id}", response_model=list[ModelResponse])
-async def remove(model_id: str):
+async def remove(model_id: Annotated[str, Path(description="ID удаляемой модели")]):
     """Удаление обученной модели (кроме дефолтных)."""
     try:
         success = model_storage.remove_model(model_id)

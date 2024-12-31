@@ -1,13 +1,9 @@
-FROM python:3.11-alpine
+FROM python:3.12-slim
 
-RUN apk add --no-cache \
-    build-base \
-    g++ \
-    gcc \
-    libffi-dev \
-    musl-dev \
-    python3-dev \
-    py3-pip
+RUN apt-get update && apt-get install -y --no-install-recommends\
+    build-essential=12.9 \
+    software-properties-common=0.99.30-4.1~deb12u1\
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /backend
 
