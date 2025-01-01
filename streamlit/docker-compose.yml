@@ -1,5 +1,17 @@
 services:
+#  app:
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+#    image: backend
+#    container_name: backend
+#    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload --workers 4
+#    ports:
+#      - 8000:8000
+#    volumes:
+#      - .:/backend
   streamlit:
+    env_file: .env
     build:
       context: .
       dockerfile: ./Dockerfile

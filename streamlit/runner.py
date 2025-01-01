@@ -15,5 +15,5 @@ for logger_name in logging.root.manager.loggerDict:
         streamlit_logger.addHandler(create_file_handler(LOGS_DIR))
 
 
-main_module = '👋app.py'
+main_module = '👋Start_page.py'
 run(main_module, False, [], {})

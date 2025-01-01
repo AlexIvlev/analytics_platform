@@ -13,12 +13,12 @@ from util.plotly_helpers import (plot_relative_price_change,
                                  plot_news_distributions)
 from util.wordcloud import create_wordcloud, create_bigram_cloud
 
-st.set_page_config(page_title="EDA", page_icon="📈")
+st.set_page_config(page_title="Exploratory data analysis", page_icon="📈")
 
 logger = configure_logger(__name__, logging.DEBUG)
 
-st.markdown("# EDA")
-st.sidebar.header("EDA")
+st.markdown("# Разведочный анализ данных")
+st.sidebar.header("Разведочный анализ данных")
 st.write(
     """На этой странице вы можете загрузить датасет и провести его исследовательский анализ (EDA).
     Выберите датасет, загрузите файл и выберите, какие графики вы хотите построить.

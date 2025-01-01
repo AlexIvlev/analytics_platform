@@ -5,45 +5,49 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 
-st.set_page_config(page_title="Models", page_icon="🤖")
+st.set_page_config(page_title="View available models", page_icon="🤖")
 
 logger = configure_logger(__name__, logging.DEBUG)
 
-st.markdown("# Models")
-st.sidebar.header("Models")
+st.markdown("# Просмотр доступных моделей")
+st.sidebar.header("Просмотр доступных моделей")
 st.write(
-    """На этой странице вы можете посмотреть информацию о существующих моделях"""
+    """На этой странице вы можете посмотреть информацию о существующих моделях и
+    сравнить их кривые обучения."""
 )
 
 
+@st.cache_data
 def fetch_models():
     response = requests.get(st.session_state.backend_url + "/models")
-    data = response.json()
-    return data
+    print(response.json())
+    return response.json()
 
 
-data = [
-    {
-        "models": [
-            {
-                "id": "linear_123",
-                "description": "Linear regression model",
-                "type": "social",
-                "hyperparameters": {"learning_rate": 0.01, "epochs": 50},
-                "learning_curve": [0.9, 0.7, 0.5, 0.3, 0.2],
-            },
-            {
-                "id": "linear_2",
-                "type": "news",
-                "description": "Linear regression model 2",
-                "hyperparameters": {"learning_rate": 0.1, "epochs": 100},
-                "learning_curve": [1.0, 0.8, 0.6, 0.4, 0.25, 0.1, 0.05],
-            },
-        ]
-    }
-]
+data = fetch_models()
 
-models = data[0]['models']
+# data = [
+#     {
+#         "models": [
+#             {
+#                 "id": "linear_123",
+#                 "description": "Linear regression model",
+#                 "type": "social",
+#                 "hyperparameters": {"learning_rate": 0.01, "epochs": 50},
+#                 "learning_curve": [0.9, 0.7, 0.5, 0.3, 0.2],
+#             },
+#             {
+#                 "id": "linear_2",
+#                 "type": "news",
+#                 "description": "Linear regression model 2",
+#                 "hyperparameters": {"learning_rate": 0.1, "epochs": 100},
+#                 "learning_curve": [1.0, 0.8, 0.6, 0.4, 0.25, 0.1, 0.05],
+#             },
+#         ]
+#     }
+# ]
+
+models = data['models']
 models_df = pd.DataFrame([
     {
         "ID": model["id"],
