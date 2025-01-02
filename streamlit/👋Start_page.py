@@ -1,7 +1,8 @@
+import logging
 import os
 
 import streamlit as st
-import logging
+
 from util.logging_handler import configure_logger
 
 BACKEND_URL = os.getenv("BACKEND_URL")

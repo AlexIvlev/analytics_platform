@@ -1,9 +1,11 @@
-import streamlit as st
 import logging
-from util.logging_handler import configure_logger
+
 import pandas as pd
 import plotly.graph_objects as go
 import requests
+import streamlit as st
+
+from util.logging_handler import configure_logger
 
 st.set_page_config(page_title="View available models", page_icon="🤖")
 

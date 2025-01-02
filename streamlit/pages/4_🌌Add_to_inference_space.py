@@ -1,6 +1,8 @@
-import streamlit as st
 import logging
+
 import requests
+import streamlit as st
+
 from util.logging_handler import configure_logger
 
 
