@@ -1,9 +1,10 @@
 import io
-import plotly.graph_objects as go
-from PIL import Image
-import plotly.express as px
+
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
+from PIL import Image
 
 
 @st.cache_data

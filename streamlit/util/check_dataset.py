@@ -19,6 +19,4 @@ def check_uploaded_data(df: DataFrame, dataset: str) -> (bool, str):
         for col in SOCIAL_EXPECTED_COLUMNS:
             if col not in df.columns:
                 return False, f"Отсутствует столбец {col}"
-        return True, None
-    else:
-        return True, None
+    return True, None
