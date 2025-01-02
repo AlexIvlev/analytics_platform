@@ -1,5 +1,6 @@
 from enum import Enum
 
+from fastapi import UploadFile
 from pydantic import BaseModel
 from typing import Any
 
@@ -17,8 +18,6 @@ class ModelConfig(BaseModel):
 
 
 class FitRequest(BaseModel):
-    X: list[list[float]]
-    y: list[float]
     config: ModelConfig
 
 

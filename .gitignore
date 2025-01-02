@@ -164,5 +164,12 @@ cython_debug/
 # Mac
 .DS_Store
 
+# Backend models
+/backend/models/inference_state.json
+/backend/models/meta.json
+
+# Backend logs
+/backend/logs
+
 # Datasets
 **.parquet
