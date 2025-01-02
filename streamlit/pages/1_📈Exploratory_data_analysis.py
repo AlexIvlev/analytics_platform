@@ -39,7 +39,7 @@ st.write(
     Social и News датасеты имеют разные опции визуализации."""
 )
 
-dataset = st.radio("Выберите датасет", ("News 📰", "Social 🧻"))
+dataset = st.radio("Выберите датасет", ("Social 🧻", "News 📰"))
 
 st.write(f"Вы выбрали датасет: {dataset}")
 
@@ -47,7 +47,7 @@ uploaded_file = st.file_uploader("Выберите parquet-файл с дата�
 
 if uploaded_file:
     df = load_data(uploaded_file)
-    correct, error_message = check_uploaded_data(df, dataset)
+    correct, error_message = check_uploaded_data(df, dataset, True)
     if correct:
         st.write("Данные успешно провалидированы!")
     else:
