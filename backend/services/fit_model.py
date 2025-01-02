@@ -3,10 +3,16 @@ import signal
 from http import HTTPStatus
 
 import cloudpickle
+import pandas as pd
 from fastapi import HTTPException
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import numpy as np
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+from pipelines.social_pipeline import CustomTransformer, preprocessor
+from serializers.fit_model import ModelConfig
 from settings import Settings
 from utils import save_model_meta
 
@@ -21,25 +27,29 @@ def timeout_handler(signum, frame):
     raise TimeoutError("Training took too long")
 
 
-def fit_model(request, timeout: int = 10):
+def fit_model(dataframe: pd.DataFrame, config: ModelConfig, timeout: int = 10):
     """Выполняет обучение модели с заданным таймаутом"""
-    model_config = request.config
+    model_config = config
     try:
         # Устанавливаем обработчик сигнала
         signal.signal(signal.SIGALRM, timeout_handler)
         # Устанавливаем таймаут
         signal.alarm(timeout)
 
-        X = np.array(request.X)
-        y = np.array(request.y)
+        dataframe['target'] = np.where(
+            dataframe['price_1d'] > dataframe['created_price'], 1, 0
+        )
+        X = dataframe.drop(columns=['target'])
+        y = dataframe['target']
 
-        model = LogisticRegression()
-        hyperparameters = model_config.hyperparameters
-        model.set_params(**hyperparameters)
-
+        social_pipeline = Pipeline([
+            ('custom', CustomTransformer()),
+            ('preprocessor', preprocessor),
+            ('scaler', StandardScaler()),
+            ('classifier', LogisticRegression(**config.hyperparameters))
+        ])
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
-
-        model.fit(X_train, y_train)
+        social_pipeline.fit(X_train, y_train)
 
         # Отключаем таймер
         signal.alarm(0)
@@ -48,7 +58,8 @@ def fit_model(request, timeout: int = 10):
         model_dir = settings.model_storage_dir
         os.makedirs(model_dir, exist_ok=True)
         model_filename = os.path.join(model_dir, f"{model_config.id}.pkl")
-        cloudpickle.dump(model, model_filename)
+        with open(model_filename, 'wb') as file:
+            cloudpickle.dump(social_pipeline, file)
 
         # Сохраняем метаданные модели
         save_model_meta(

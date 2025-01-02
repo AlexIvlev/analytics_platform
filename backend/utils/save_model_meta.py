@@ -2,7 +2,7 @@ import os
 import json
 from typing import Any
 
-LEARNING_CURVE_STUB = [1.0, 0.8, 0.6, 0.4, 0.25, 0.1, 0.05]
+LEARNING_CURVE_STUB_DEFAULT = [1.0, 0.8, 0.6, 0.4, 0.25, 0.1, 0.05]
 
 
 def save_model_meta(
@@ -11,7 +11,8 @@ def save_model_meta(
         model_id: str,
         description: str,
         model_type: str,
-        hyperparameters: dict[str, Any]
+        hyperparameters: dict[str, Any],
+        learning_curve: list[float] | None = None
 ):
     """
     Сохраняет метаинформацию о модели в файл json.
@@ -35,7 +36,7 @@ def save_model_meta(
         "description": description,
         "type": model_type,
         "hyperparameters": hyperparameters,
-        "learning_curve": LEARNING_CURVE_STUB
+        "learning_curve": learning_curve or LEARNING_CURVE_STUB_DEFAULT
     }
 
     with open(meta_path, "w", encoding="utf-8") as meta_file:

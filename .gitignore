@@ -166,3 +166,10 @@ cython_debug/
 
 # Datasets
 **.parquet
+
+# Backend models
+/backend/models/inference_state.json
+/backend/models/meta.json
+
+# Backend logs
+/backend/logs
