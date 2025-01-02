@@ -20,3 +20,4 @@
 
 ## Анимация использования нашего сервиса:
 [![Видео на YouTube](https://img.youtube.com/vi/grstNC2_hAY/maxresdefault.jpg)](https://www.youtube.com/watch?v=grstNC2_hAY)
+[![Видео на YouTube](https://img.youtube.com/vi/6FzxplgHopQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=6FzxplgHopQ)
