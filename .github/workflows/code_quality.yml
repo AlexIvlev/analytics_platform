@@ -28,8 +28,7 @@ jobs:
         pip install pycodestyle
 
     - name: Run pycodestyle
-      run: |
-        find . -name "*.py" -exec pycodestyle --max-line-length=120 {} +
+      run: find . -name "*.py" -exec pycodestyle --max-line-length=120 {} +
 
   flake8_check:
     name: Flake8 Check
@@ -50,8 +49,7 @@ jobs:
         pip install flake8
 
     - name: Run flake8
-      run: |
-        flake8 . --max-line-length=120
+      run: flake8 . --max-line-length=120
 
   pylint_check:
     name: Pylint Check
@@ -72,8 +70,7 @@ jobs:
         pip install pylint
 
     - name: Run pylint
-      run: |
-        pylint . --max-line-length=120 --disable="C0103,C0114,C0115,R1735,W2402,E0401"
+      run: pylint . --max-line-length=120 --disable="C0103,C0114,C0115,R1735,W2402"
 
   docker_lint:
     name: Dockerfile Lint Check
@@ -89,8 +86,7 @@ jobs:
         chmod +x hadolint
 
     - name: Find and lint all Dockerfiles
-      run: |
-        find . -name "Dockerfile" -exec ./hadolint {} +
+      run: find . -name "Dockerfile" -exec ./hadolint {} +
 
   shell_lint:
     name: Shell Script Lint Check
