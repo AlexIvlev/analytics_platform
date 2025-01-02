@@ -30,7 +30,7 @@ def fetch_inference_space_models():
 
 
 @st.cache_data
-def predict(model_id, data):
+def predict(model_id, model_type, data):
     parquet_buffer = io.BytesIO()
     data.to_parquet(parquet_buffer, index=False)
     parquet_buffer.seek(0)
@@ -38,7 +38,7 @@ def predict(model_id, data):
     files = {
         "file": ("data.parquet", parquet_buffer, "application/octet-stream")
     }
-    payload = {"id": model_id}
+    payload = {"id": model_id, "model_type": model_type}
 
     response = requests.post(
         st.session_state.backend_url + "/predict",
@@ -61,6 +61,7 @@ st.write(
     Для добавление модели в пространство инференса выберите соответствующий пункт меню.""")
 
 model_type = st.radio("Выберите тип модели", ("Social 🧻", "News 📰"))
+model_type_normalized = "social" if model_type == "Social 🧻" else "news"
 
 st.write(f"Вы выбрали тип модели: {model_type}")
 
@@ -75,7 +76,6 @@ if uploaded_file:
         st.error(error_message)
 
     models = fetch_inference_space_models()['models']
-    print(models)
 
     model_id = st.selectbox("Выберите модель", list(models.keys()))
 
@@ -83,6 +83,6 @@ if uploaded_file:
 
     if predict_button:
         st.write("Предсказание:")
-        prediction = predict(model_id, df)
+        prediction = predict(model_id, model_type_normalized, df)
 
         st.json(prediction)
