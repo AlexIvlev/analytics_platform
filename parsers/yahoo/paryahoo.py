@@ -1,6 +1,6 @@
-import yfinance as yf
-import pandas as pd
 from datetime import datetime
+import pandas
+import yfinance
 
 
 def get_daily_data(ticker_symbol, period='1y'):
