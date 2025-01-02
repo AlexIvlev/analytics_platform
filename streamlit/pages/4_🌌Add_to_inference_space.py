@@ -4,6 +4,7 @@ import requests
 import streamlit as st
 
 from util.logging_handler import configure_logger
+from util.model_helper import fetch_models
 
 
 @st.cache_data
@@ -13,19 +14,7 @@ def fetch_inference_space_models():
         logger.error(response.text)
         return []
     logger.debug(response.json())
-    # return response.json()
-    stub_data = {
-        "social": "social_logreg",
-        "news": "news_logreg"
-    }
-    return stub_data
-
-
-@st.cache_data
-def fetch_models():
-    response = requests.get(st.session_state.backend_url + "/models")
-    print(response.json())
-    return response.json()["models"]
+    return response.json()
 
 
 @st.cache_data

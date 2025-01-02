@@ -1,4 +1,4 @@
-import ast
+import io
 import logging
 
 import pandas as pd
@@ -31,12 +31,25 @@ def fetch_inference_space_models():
 
 @st.cache_data
 def predict(model_id, data):
-    print(type(data))
-    response = requests.post(st.session_state.backend_url + "/predict", json={"id": model_id, "X": data})
-    print(response.request.body)
+    parquet_buffer = io.BytesIO()
+    data.to_parquet(parquet_buffer, index=False)
+    parquet_buffer.seek(0)
+
+    files = {
+        "file": ("data.parquet", parquet_buffer, "application/octet-stream")
+    }
+    payload = {"id": model_id}
+
+    response = requests.post(
+        st.session_state.backend_url + "/predict",
+        data=payload,
+        files=files
+    )
+
     if response.status_code != 200:
         logger.error(response.text)
         return []
+
     logger.debug(response.json())
     return response.json()
 
@@ -70,6 +83,6 @@ if uploaded_file:
 
     if predict_button:
         st.write("Предсказание:")
-        prediction = predict(model_id, df.to_numpy())
+        prediction = predict(model_id, df)
 
         st.json(prediction)
