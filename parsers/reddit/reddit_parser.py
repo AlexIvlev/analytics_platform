@@ -49,7 +49,7 @@ class RedditParser:
                         entries.extend(self._process_submission(sub, subreddit))
                     except prawcore.exceptions.TooManyRequests:
                         logging.error(f"Rate limit exceeded while processing '{subreddit}'->'{sub.id}'")
-                        logging.error(f"Sleeping for 1 minute and continuing from next submission")
+                        logging.error("Sleeping for 1 minute and continuing from next submission")
                         time.sleep(self.RATELIMIT_SLEEP_SECONDS)
             except prawcore.exceptions.NotFound:
                 logging.error(f"Subreddit '{subreddit}' not found")
