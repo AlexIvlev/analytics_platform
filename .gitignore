@@ -170,3 +170,6 @@ cython_debug/
 
 # Backend logs
 /backend/logs
+
+# Datasets
+**.parquet

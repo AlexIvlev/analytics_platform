@@ -1,0 +1,5 @@
+logs
+streamlit.iml
+Dockerfile
+__pycache__
+.dockerignore
