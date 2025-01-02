@@ -76,7 +76,10 @@ async def status():
 
 
 @router.post("/predict", response_model=PredictResponse)
-async def predict(request: Annotated[PredictRequest, Body(description="Запрос на предсказание модели")]):
+async def predict(
+    model_type: Annotated[str, Form()],
+    file: Annotated[UploadFile, File(description="Parquet-файл с данными для предсказания")]
+):
     """Предсказание от загруженной модели."""
     try:
         predictions = model_manager.predict(request.id, request.X)
