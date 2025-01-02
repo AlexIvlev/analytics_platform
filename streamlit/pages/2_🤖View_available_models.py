@@ -2,10 +2,10 @@ import logging
 
 import pandas as pd
 import plotly.graph_objects as go
-import requests
 import streamlit as st
 
 from util.logging_handler import configure_logger
+from util.model_helper import fetch_models
 
 st.set_page_config(page_title="View available models", page_icon="🤖")
 
@@ -19,16 +19,8 @@ st.write(
 )
 
 
-@st.cache_data
-def fetch_models():
-    response = requests.get(st.session_state.backend_url + "/models")
-    print(response.json())
-    return response.json()
+models = fetch_models()
 
-
-data = fetch_models()
-
-models = data['models']
 models_df = pd.DataFrame([
     {
         "ID": model["id"],
