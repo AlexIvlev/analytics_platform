@@ -1,11 +1,11 @@
 from collections import Counter
 
 import plotly.graph_objects as go
+from nltk import ngrams
 from pandas import DataFrame
 from wordcloud import WordCloud
 
 from .plotly_helpers import create_image
-from nltk import ngrams
 
 
 def create_wordcloud(df: DataFrame) -> go.Figure:

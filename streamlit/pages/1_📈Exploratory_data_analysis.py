@@ -13,24 +13,6 @@ from util.plotly_helpers import (plot_relative_price_change,
                                  plot_news_distributions)
 from util.wordcloud import create_wordcloud, create_bigram_cloud
 
-st.set_page_config(page_title="EDA", page_icon="📈")
-
-logger = configure_logger(__name__, logging.DEBUG)
-
-st.markdown("# EDA")
-st.sidebar.header("EDA")
-st.write(
-    """На этой странице вы можете загрузить датасет и провести его исследовательский анализ (EDA).
-    Выберите датасет, загрузите файл и выберите, какие графики вы хотите построить.
-    Social и News датасеты имеют разные опции визуализации."""
-)
-
-dataset = st.radio("Выберите датасет", ("News 📰", "Social 🧻"))
-
-st.write(f"Вы выбрали датасет: {dataset}")
-
-uploaded_file = st.file_uploader("Выберите parquet-файл с датасетом", type=["parquet"])
-
 
 @st.cache_data
 def load_data(file: UploadedFile) -> pd.DataFrame:
@@ -44,6 +26,24 @@ def plot_wordcloud(data: pd.DataFrame) -> None:
     st.plotly_chart(wordcloud, key='wordcloud')
     st.plotly_chart(bigram_cloud, key='bigram_wordcloud')
 
+
+st.set_page_config(page_title="Exploratory data analysis", page_icon="📈")
+
+logger = configure_logger(__name__, logging.DEBUG)
+
+st.markdown("# Разведочный анализ данных")
+st.sidebar.header("Разведочный анализ данных")
+st.write(
+    """На этой странице вы можете загрузить датасет и провести его исследовательский анализ (EDA).
+    Выберите датасет, загрузите файл и выберите, какие графики вы хотите построить.
+    Social и News датасеты имеют разные опции визуализации."""
+)
+
+dataset = st.radio("Выберите датасет", ("News 📰", "Social 🧻"))
+
+st.write(f"Вы выбрали датасет: {dataset}")
+
+uploaded_file = st.file_uploader("Выберите parquet-файл с датасетом", type=["parquet"])
 
 if uploaded_file:
     df = load_data(uploaded_file)
@@ -84,6 +84,5 @@ if uploaded_file:
             figures = plot_temporal_analysis(df)
             for fig in figures:
                 st.plotly_chart(fig)
-
 
 logger.debug("EDA page loaded")

@@ -1,9 +1,10 @@
 import io
-import plotly.graph_objects as go
-from PIL import Image
-import plotly.express as px
+
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
+from PIL import Image
 
 
 @st.cache_data
@@ -254,5 +255,3 @@ def plot_temporal_analysis(df: pd.DataFrame) -> (go.Figure, go.Figure, go.Figure
     fig_month_sector.update_layout(xaxis_tickangle=45)
 
     return fig_day_article, fig_month_article, fig_day_sector, fig_month_sector
-
-
