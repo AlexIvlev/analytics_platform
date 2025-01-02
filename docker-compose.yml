@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload --workers 4
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend:/backend
+    networks:
+      - app_network
+  streamlit:
+    env_file: streamlit/.env
+    build:
+      context: streamlit
+      dockerfile: Dockerfile
+    container_name: streamlit
+    command: python3 runner.py
+    ports:
+      - 8501:8501
+    networks:
+        - app_network
+
+networks:
+  app_network:
