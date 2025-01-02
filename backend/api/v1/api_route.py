@@ -96,9 +96,7 @@ async def predict(
     try:
         if not file.filename.endswith(".parquet"):
             raise HTTPException(status_code=400, detail="File must be with .parquet extension")
-
         df = pd.read_parquet(file.file)
-
         if df.empty:
             raise HTTPException(status_code=400, detail="File is empty")
 
