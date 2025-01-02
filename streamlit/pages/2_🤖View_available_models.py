@@ -28,27 +28,6 @@ def fetch_models():
 
 data = fetch_models()
 
-# data = [
-#     {
-#         "models": [
-#             {
-#                 "id": "linear_123",
-#                 "description": "Linear regression model",
-#                 "type": "social",
-#                 "hyperparameters": {"learning_rate": 0.01, "epochs": 50},
-#                 "learning_curve": [0.9, 0.7, 0.5, 0.3, 0.2],
-#             },
-#             {
-#                 "id": "linear_2",
-#                 "type": "news",
-#                 "description": "Linear regression model 2",
-#                 "hyperparameters": {"learning_rate": 0.1, "epochs": 100},
-#                 "learning_curve": [1.0, 0.8, 0.6, 0.4, 0.25, 0.1, 0.05],
-#             },
-#         ]
-#     }
-# ]
-
 models = data['models']
 models_df = pd.DataFrame([
     {
