@@ -13,6 +13,20 @@ from util.plotly_helpers import (plot_relative_price_change,
                                  plot_news_distributions)
 from util.wordcloud import create_wordcloud, create_bigram_cloud
 
+
+@st.cache_data
+def load_data(file: UploadedFile) -> pd.DataFrame:
+    return pd.read_parquet(file)
+
+
+@st.cache_data
+def plot_wordcloud(data: pd.DataFrame) -> None:
+    wordcloud = create_wordcloud(data)
+    bigram_cloud = create_bigram_cloud(data)
+    st.plotly_chart(wordcloud, key='wordcloud')
+    st.plotly_chart(bigram_cloud, key='bigram_wordcloud')
+
+
 st.set_page_config(page_title="Exploratory data analysis", page_icon="📈")
 
 logger = configure_logger(__name__, logging.DEBUG)
@@ -30,20 +44,6 @@ dataset = st.radio("Выберите датасет", ("News 📰", "Social 🧻
 st.write(f"Вы выбрали датасет: {dataset}")
 
 uploaded_file = st.file_uploader("Выберите parquet-файл с датасетом", type=["parquet"])
-
-
-@st.cache_data
-def load_data(file: UploadedFile) -> pd.DataFrame:
-    return pd.read_parquet(file)
-
-
-@st.cache_data
-def plot_wordcloud(data: pd.DataFrame) -> None:
-    wordcloud = create_wordcloud(data)
-    bigram_cloud = create_bigram_cloud(data)
-    st.plotly_chart(wordcloud, key='wordcloud')
-    st.plotly_chart(bigram_cloud, key='bigram_wordcloud')
-
 
 if uploaded_file:
     df = load_data(uploaded_file)
@@ -84,6 +84,5 @@ if uploaded_file:
             figures = plot_temporal_analysis(df)
             for fig in figures:
                 st.plotly_chart(fig)
-
 
 logger.debug("EDA page loaded")
