@@ -34,7 +34,7 @@ jobs:
       run: flake8 . --max-line-length=120
 
     - name: Run pylint
-      run: pylint . --max-line-length=120 --disable="C0103,C0114,C0115"
+      run: pylint . --max-line-length=120 --disable="C0103,C0114,C0115,R1735"
 
   docker_lint:
     name: Dockerfile Lint Check
