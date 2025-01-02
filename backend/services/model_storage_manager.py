@@ -46,7 +46,7 @@ class ModelStorageManager:
                 # Если модель дефолтная, пропускаем удаление
                 return False
 
-            model_path = os.path.join(self.model_storage_dir, model_id + ".joblib")
+            model_path = os.path.join(self.model_storage_dir, model_id + ".pkl")
             if os.path.exists(model_path):
                 os.remove(model_path)
             else:

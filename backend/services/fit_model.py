@@ -2,10 +2,10 @@ import os
 import signal
 from http import HTTPStatus
 
+import cloudpickle
 from fastapi import HTTPException
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-import joblib
 import numpy as np
 from settings import Settings
 from utils import save_model_meta
@@ -47,8 +47,8 @@ def fit_model(request, timeout: int = 10):
         # Сохраняем модель
         model_dir = settings.model_storage_dir
         os.makedirs(model_dir, exist_ok=True)
-        model_filename = os.path.join(model_dir, f"{model_config.id}.joblib")
-        joblib.dump(model, model_filename)
+        model_filename = os.path.join(model_dir, f"{model_config.id}.pkl")
+        cloudpickle.dump(model, model_filename)
 
         # Сохраняем метаданные модели
         save_model_meta(

@@ -1,0 +1,30 @@
+{
+    "social_logreg": {
+        "description": "Default social model",
+        "type": "social",
+        "hyperparameters": {},
+        "learning_curve": [
+            1.0,
+            0.8,
+            0.6,
+            0.4,
+            0.25,
+            0.1,
+            0.05
+        ]
+    },
+    "news_logreg": {
+        "description": "Default news model",
+        "type": "news",
+        "hyperparameters": {},
+        "learning_curve": [
+            1.0,
+            0.8,
+            0.6,
+            0.4,
+            0.25,
+            0.1,
+            0.05
+        ]
+    }
+}

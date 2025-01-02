@@ -1,9 +1,11 @@
 import json
 import os
-import joblib
 
+import cloudpickle
 
+from serializers import ModelType
 from settings import Settings
+from utils import save_model_meta
 
 settings = Settings()
 
@@ -18,11 +20,12 @@ class ModelInferenceManager:
         self._load_state()
 
     def _load_model_into_memory(self, model_id: str):
-        """Загрузка модели из файла"""
-        model_path = os.path.join(self.model_storage_dir, f"{model_id}.joblib")
+        """Загрузка модели из файла с использованием cloudpickle.loads"""
+        model_path = os.path.join(self.model_storage_dir, f"{model_id}.pkl")
         if not os.path.exists(model_path):
-            raise FileNotFoundError(f"Model '{model_id}.joblib' not found at path {model_path}")
-        return joblib.load(model_path)
+            raise FileNotFoundError(f"Model '{model_id}.pkl' not found at path {model_path}")
+        with open(model_path, "rb") as f:
+            return cloudpickle.load(f)
 
     def _save_state(self):
         """Сохранение состояния загрузки моделей (только идентификаторы)"""
@@ -34,10 +37,36 @@ class ModelInferenceManager:
         if os.path.exists(self.state_file):
             with open(self.state_file, "r") as f:
                 state = json.load(f)
-                for model_type, model_id in state.items():
-                    if model_id:
-                        self.loaded_models[model_type] = self._load_model_into_memory(model_id)
-                        self.loaded_model_ids[model_type] = model_id
+        else:
+            state = {
+                "social": settings.default_model_social,
+                "news": settings.default_model_news
+            }
+
+        for model_type, model_id in state.items():
+            if model_id:
+                self.loaded_models[model_type] = self._load_model_into_memory(model_id)
+                self.loaded_model_ids[model_type] = model_id
+
+        with open(self.state_file, "w") as f:
+            json.dump(state, f, ensure_ascii=False, indent=4)
+
+        save_model_meta(
+            model_storage_dir=settings.model_storage_dir,
+            model_meta_file=settings.model_meta_file,
+            model_id=settings.default_model_social.split('.')[0],
+            description="Default social model",
+            model_type=ModelType.social,
+            hyperparameters={},
+        )
+        save_model_meta(
+            model_storage_dir=settings.model_storage_dir,
+            model_meta_file=settings.model_meta_file,
+            model_id=settings.default_model_news.split('.')[0],
+            description="Default news model",
+            model_type=ModelType.news,
+            hyperparameters={},
+        )
 
     def load(self, model_type: str, model_id: str):
         """

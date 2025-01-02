@@ -1,64 +1,17 @@
-import json
-from contextlib import asynccontextmanager
-from pathlib import Path
-
-import joblib
 from fastapi import FastAPI
 from pydantic import BaseModel, ConfigDict
 from api.v1.api_route import router as models_router
-from serializers import ModelType
 from settings import Settings
 from multiprocessing import Value, Lock
 
-from utils import save_model_meta
-
 settings = Settings()
-
-
-@asynccontextmanager
-async def ml_lifespan_manager(app: FastAPI):
-    inference_state_path = Path(settings.model_storage_dir) / "inference_state.json"
-
-    try:
-        if not inference_state_path.exists():
-            state = {
-                "social": settings.default_model_social,
-                "news": settings.default_model_news
-            }
-
-            with open(inference_state_path, "w") as f:
-                json.dump(state, f, ensure_ascii=False, indent=4)
-
-        save_model_meta(
-            model_storage_dir=settings.model_storage_dir,
-            model_meta_file=settings.model_meta_file,
-            model_id=settings.default_model_social.split('.')[0],
-            description="Default social model",
-            model_type=ModelType.social,
-            hyperparameters={},
-        )
-        save_model_meta(
-            model_storage_dir=settings.model_storage_dir,
-            model_meta_file=settings.model_meta_file,
-            model_id=settings.default_model_news.split('.')[0],
-            description="Default news model",
-            model_type=ModelType.news,
-            hyperparameters={},
-        )
-
-        yield
-    except Exception as e:
-        print(f"Error in ml_lifespan_manager: {e}")
-    finally:
-        pass
 
 app = FastAPI(
     title="backend",
     docs_url="/api/openapi",
     openapi_url="/api/openapi.json",
-    lifespan=ml_lifespan_manager
-)
 
+)
 
 class StatusResponse(BaseModel):
     status: str
