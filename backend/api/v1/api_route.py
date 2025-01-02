@@ -89,7 +89,7 @@ async def status():
 
 @router.post("/predict", response_model=PredictResponse)
 async def predict(
-    model_type: str,
+    model_type: Annotated[str, Form()],
     file: Annotated[UploadFile, File(description="Parquet-файл с данными для предсказания")]
 ):
     """Предсказание от загруженной модели."""
