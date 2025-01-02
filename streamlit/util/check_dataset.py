@@ -7,7 +7,7 @@ SOCIAL_EXPECTED_COLUMNS = ['id', 'title', 'url', 'subreddit', 'created_utc', 'pa
                            'price_1d']
 
 
-def check_uploaded_data(df: DataFrame, dataset: str, check_size: bool=False) -> (bool, str):
+def check_uploaded_data(df: DataFrame, dataset: str, check_size: bool = False) -> (bool, str):
     if df.shape[0] == 0:
         return False, "Загружен пустой датасет"
     if check_size and df.shape[0] < 100:

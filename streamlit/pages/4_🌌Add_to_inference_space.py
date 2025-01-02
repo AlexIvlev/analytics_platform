@@ -13,12 +13,7 @@ def fetch_inference_space_models():
         logger.error(response.text)
         return []
     logger.debug(response.json())
-    # return response.json()
-    stub_data = {
-        "social": "social_logreg",
-        "news": "news_logreg"
-    }
-    return stub_data
+    return response.json()
 
 
 @st.cache_data
