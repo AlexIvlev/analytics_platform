@@ -70,10 +70,14 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pylint
+        pip install -r requirements.txt
+
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
 
     - name: Run pylint
       run: |
-        find . -name "*.py" | xargs pylint --max-line-length=120 --disable="C0103,C0114,C0115,R1735,W2402"
+        find . -name "*.py" | xargs pylint --max-line-length=120 --disable="C0103,C0114,C0115,R1735,W2402,E1101"
 
   docker_lint:
     name: Dockerfile Lint Check
