@@ -1,4 +1,5 @@
 import io
+import json
 import logging
 import uuid
 
@@ -35,12 +36,13 @@ def fit_model(data: pd.DataFrame, model_config: dict) -> None:
     files = {
         "file": ("data.parquet", parquet_buffer, "application/octet-stream")
     }
+    data_payload = {"config": model_config}
 
     response = requests.post(
-        st.session_state.backend_url + "/fit",
-        data=model_config,
-        files=files
-    )
+            st.session_state.backend_url + "/fit",
+            data={"config": json.dumps(model_config)},
+            files=files
+        )
 
     if response.status_code != 200:
         logger.error(response.text)
