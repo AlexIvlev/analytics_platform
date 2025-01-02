@@ -1,0 +1,11 @@
+# Model settings
+MODEL_STORAGE_DIR=models
+DEFAULT_MODEL_SOCIAL=social_logreg
+DEFAULT_MODEL_NEWS=news_logreg
+MODEL_META_FILE=meta.json
+
+# Logging settings
+LOGS_DIR = logs
+
+# Train settings
+NUM_CORES=2  # число доступных ядер для процессов обучения
