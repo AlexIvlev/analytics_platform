@@ -29,7 +29,7 @@ jobs:
 
     - name: Run pycodestyle
       run: |
-        find . -name "*.py" -exec pycodestyle --max-line-length=120 {} + || true
+        find . -name "*.py" -exec pycodestyle --max-line-length=120 {} +
 
   flake8_check:
     name: Flake8 Check
@@ -51,7 +51,7 @@ jobs:
 
     - name: Run flake8
       run: |
-        flake8 . --max-line-length=120 || true
+        flake8 . --max-line-length=120
 
   pylint_check:
     name: Pylint Check
@@ -73,7 +73,7 @@ jobs:
 
     - name: Run pylint
       run: |
-        pylint . --max-line-length=120 --disable="C0103,C0114,C0115,R1735,W2402,E1101" || true
+        pylint . --max-line-length=120 --disable="C0103,C0114,C0115,R1735,W2402,E0401"
 
   docker_lint:
     name: Dockerfile Lint Check
@@ -90,7 +90,7 @@ jobs:
 
     - name: Find and lint all Dockerfiles
       run: |
-        find . -name "Dockerfile" -exec ./hadolint {} + || true
+        find . -name "Dockerfile" -exec ./hadolint {} +
 
   shell_lint:
     name: Shell Script Lint Check
@@ -103,5 +103,5 @@ jobs:
     - name: Run ShellCheck on all shell scripts
       run: |
         find . -name "*.sh" | while read -r file; do
-          docker run --rm -v ${{ github.workspace }}:/mnt koalaman/shellcheck:stable /mnt/"$file" || true;
+          docker run --rm -v ${{ github.workspace }}:/mnt koalaman/shellcheck:stable /mnt/"$file";
         done
