@@ -1,16 +1,11 @@
-import io
-
-import json
-import pandas as pd
 from multiprocessing import Process
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Request, Path, Body, UploadFile, Form, File
+from fastapi import APIRouter, HTTPException, Request, Path, Body
 from http import HTTPStatus
 
-from serializers import FitResponse, ModelResponse, PredictResponse, PredictRequest, \
+from serializers import FitRequest, FitResponse, ModelResponse, PredictResponse, PredictRequest, \
     SetResponse, SetRequest, StatusResponse, ModelListResponse
-from serializers.fit_model import ModelConfig
 from services import fit_model, ModelStorageManager, ModelInferenceManager
 from settings import Settings
 
@@ -27,8 +22,7 @@ model_manager = ModelInferenceManager(
 
 @router.post("/fit", status_code=HTTPStatus.CREATED, response_model=FitResponse)
 async def fit(
-    config: Annotated[str, Form()],
-    file: UploadFile,
+    request: Annotated[FitRequest, Body(description="Запрос на запуск обучения модели")],
     req: Request
 ):
     """Запуск обучения модели в отдельном процессе."""
@@ -36,32 +30,26 @@ async def fit(
     lock = req.app.state.lock
     max_train_processes = req.app.state.max_train_processes
 
-    config_dict = json.loads(config)
-    config = ModelConfig(**config_dict)
-
     with lock:
         if active_train_processes.value >= max_train_processes:
             raise HTTPException(
                 status_code=HTTPStatus.TOO_MANY_REQUESTS,
-                detail=f"Failed to train model {config.id}: No available processes"
+                detail=f"Failed to train model {request.config.id}: No available processes"
             )
         active_train_processes.value += 1
 
     try:
-        file_content = await file.read()
-        df = pd.read_parquet(io.BytesIO(file_content))
-
-        process = Process(target=fit_model, args=(df, config), kwargs={"timeout": 10})
+        process = Process(target=fit_model, args=(request,), kwargs={"timeout": 10})
         process.start()
         process.join()
 
         if process.exitcode != 0:
             raise HTTPException(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                detail=f"Model {config.id} training failed"
+                detail=f"Model {request.config.id} training failed"
             )
 
-        return FitResponse(message=f"Model {config.id} training completed successfully")
+        return FitResponse(message=f"Model {request.config.id} training completed successfully")
 
     finally:
         with lock:
@@ -88,21 +76,10 @@ async def status():
 
 
 @router.post("/predict", response_model=PredictResponse)
-async def predict(
-    model_type: str,
-    file: Annotated[UploadFile, File(description="Parquet-файл с данными для предсказания")]
-):
+async def predict(request: Annotated[PredictRequest, Body(description="Запрос на предсказание модели")]):
     """Предсказание от загруженной модели."""
     try:
-        if not file.filename.endswith(".parquet"):
-            raise HTTPException(status_code=400, detail="File must be with .parquet extension")
-
-        df = pd.read_parquet(file.file)
-
-        if df.empty:
-            raise HTTPException(status_code=400, detail="File is empty")
-
-        predictions = model_manager.predict(model_type, df)
+        predictions = model_manager.predict(request.id, request.X)
         return PredictResponse(predictions=predictions)
     except ValueError as e:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=str(e))
