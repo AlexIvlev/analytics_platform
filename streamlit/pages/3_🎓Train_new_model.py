@@ -1,3 +1,4 @@
+import ast
 import io
 import json
 import logging
@@ -36,18 +37,23 @@ def fit_model(data: pd.DataFrame, model_config: dict) -> None:
     files = {
         "file": ("data.parquet", parquet_buffer, "application/octet-stream")
     }
-    data_payload = {"config": model_config}
+
+    print(model_config)
+
+    payload = {"config": json.dumps(model_config)}
 
     response = requests.post(
-            st.session_state.backend_url + "/fit",
-            data={"config": json.dumps(model_config)},
-            files=files
-        )
+                st.session_state.backend_url + "/fit",
+                data=payload,
+                files=files
+            )
 
-    if response.status_code != 200:
+    if response.status_code != 201:
         logger.error(response.text)
+        st.error("Произошла ошибка при обучении модели")
         return []
     logger.debug(response.json())
+    st.success("Процесс обучения завершён!")
     return response.json()
 
 
@@ -66,23 +72,17 @@ if uploaded_file:
         st.error(error_message)
 
     desc = st.text_input("Введите описание модели", value="Моя первая модель")
-    hyper = st.text_input("Введите гиперпараметры модели в формате JSON", value='{"n_estimators": 100, "max_depth": 5}')
+    hyper = st.text_input("Введите гиперпараметры модели в формате JSON",
+                          value='{"tol" : 0.0001, "C" : 1.0, "class_weight" : None}')
     model_id = str(uuid.uuid4())
 
     model_config = {
         "id": model_id,
         "type": model_type_normalized,
         "description": desc,
-        "hyperparameters": hyper
+        "hyperparameters": ast.literal_eval(hyper)
     }
 
     fit_model_button = st.button("Обучить модель")
     if fit_model_button:
-
-        response = requests.post(st.session_state.backend_url + "/fit", json=model_config)
-        if response.status_code != 200:
-            logger.error(response.text)
-            st.error("Произошла ошибка при обучении модели")
-        else:
-            logger.debug(response.json())
-            st.success("Процесс обучения запущен!")
+        fit_model(df, model_config)
